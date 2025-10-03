@@ -5,10 +5,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
+import java.util.concurrent.*;
 import java.util.stream.Collectors;
 
 public class Main {
@@ -39,7 +36,7 @@ public class Main {
         }
         ExecutorService pool = Executors.newFixedThreadPool(threads);
         ThreadLocal<Map<String, Long>> threadlocal = ThreadLocal.withInitial(HashMap<String, Long>::new);
-        Map<String, Long> global = new HashMap<>();
+        Map<String, Long> global = new ConcurrentHashMap<>(threads);
         List<Future<?>> futures = new ArrayList<>(threads);
         try {
             for (String s : chunkingText) {
