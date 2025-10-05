@@ -1,7 +1,6 @@
 package edu.polina.timerthreads;
 
-import java.util.Arrays;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.stream.Collectors;
@@ -11,6 +10,7 @@ public class Main {
         int threads = Runtime.getRuntime().availableProcessors();
         LinkedBlockingDeque<Map<String, Long>> queue = new LinkedBlockingDeque<>(threads);
         Map<String, Long> global = new ConcurrentHashMap<>(threads);
+        List<Thread> threadList = Collections.synchronizedList(new ArrayList<>());
         for (int i = 0; i < threads; i++) {
             Thread thread = new Thread(() -> {
                 Map<String, Long> local = Arrays.stream("C:\\Users\\Professional\\java-projects\\github\\ProjectCore>".split("\\\\"))
@@ -18,20 +18,20 @@ public class Main {
                         .filter(k -> !k.isEmpty())
                         .collect(Collectors.groupingBy(k -> k, Collectors.counting()));
                 queue.add(local);
-                for (Map<String, Long> m : queue) {
-                    for(Map.Entry<String, Long> p: m.entrySet()) {
-                        global.merge(p.getKey(), p.getValue(), Long::sum);
-                    }
-                }
             });
+            threadList.add(thread);
+        }
+        for (Thread t : threadList) {
             try {
-                thread.start();
-                thread.join(500);
+                t.start();
+                t.join(500);
             } catch (InterruptedException _) {
                 Thread.currentThread().interrupt();
-            } finally {
-                global.forEach(((k, v) -> System.out.println(k + ":" + v)));
             }
+        }
+        for (Map<String, Long> m : queue) {
+            m.forEach((k, v) -> global.merge(k, v, Long::sum));
+            global.forEach(((k, v) -> System.out.println(k + ":" + v)));
         }
 
     }
