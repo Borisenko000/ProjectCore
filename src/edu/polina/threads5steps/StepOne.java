@@ -12,46 +12,46 @@ public class StepOne {
             range.add(i);
         }
         int threads = Math.min(Runtime.getRuntime().availableProcessors(), n);
-        int chunk = (n + threads + 1) / threads;
+        int chunk = (n + threads - 1) / threads;
         List<List<Integer>> chunks = new ArrayList<>(threads);
-        for (int from = 0; from <= range.size() && from + chunk <= range.size(); from += chunk) {
+        for (int from = 0; from < range.size(); from += chunk) {
             List<Integer> chunkList = new ArrayList<>();
-            for (int to = 0; to <= chunk; to++) {
+            for (int to = 0; to < chunk && from + to < range.size(); to++) {
                 chunkList.add(range.get(from + to));
             }
             chunks.add(chunkList);
         }
         ExecutorService pool = Executors.newFixedThreadPool(threads);
-        CountDownLatch count = new CountDownLatch(threads);
-        List<Integer> sumList = new ArrayList<>();
-        List<Future<?>> futures = new ArrayList<>(threads);
-        for (List<Integer> c:chunks){
-            try {
-                Future<?> f = pool.submit(() -> {
-                    int sumChunk = c.stream().mapToInt(Integer::intValue).sum();
-                    sumList.add(sumChunk);
-                });
-                futures.add(f);
-            } finally {
-                count.countDown();
-            }
+        CountDownLatch count = new CountDownLatch(chunks.size());
+        List<Future<Integer>> futures = new ArrayList<>(threads);
+        for (List<Integer> c : chunks) {
+            Future<Integer> f = pool.submit(() -> {
+                try {
+                    return c.stream().mapToInt(Integer::intValue).sum();
+                } finally {
+                    count.countDown();
+                }
+            });
+            futures.add(f);
         }
         try {
             count.await();
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
-        for (Future<?> f : futures) {
-            try {
-                f.get();
-            } catch (InterruptedException _) {
-                Thread.currentThread().interrupt();
-            } catch (ExecutionException e) {
-                System.out.println("Ошибка выполнения задачи" + e.getCause());
-            } finally {
-                pool.shutdown();
+        int total = 0;
+        try {
+            for (Future<Integer> f : futures) {
+                total += f.get();
             }
+        } catch (InterruptedException _) {
+            Thread.currentThread().interrupt();
+            return;
+        } catch (ExecutionException e) {
+            System.out.println("Ошибка выполнения задачи" + e.getCause());
+        } finally {
+            pool.shutdown();
         }
-        sumList.forEach(System.out::println);
+        System.out.println(total);
     }
 }
