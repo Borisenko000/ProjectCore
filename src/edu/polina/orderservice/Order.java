@@ -5,17 +5,17 @@ import java.util.concurrent.Delayed;
 import java.util.concurrent.TimeUnit;
 
 public class Order implements Delayed {
-    String id;
+    final String id;
     long expireMillis;
 
     public Order(String id, long delayMillis) {
         this.id = id;
-        expireMillis = new Date().getTime() + delayMillis;
+        expireMillis = System.currentTimeMillis() + delayMillis;
     }
 
     @Override
     public long getDelay(TimeUnit unit) {
-        return unit.convert(expireMillis - new Date().getTime(), TimeUnit.MILLISECONDS);
+        return unit.convert(expireMillis - System.currentTimeMillis(), TimeUnit.MILLISECONDS);
     }
 
     @Override

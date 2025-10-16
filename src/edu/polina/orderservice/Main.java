@@ -1,8 +1,12 @@
 package edu.polina.orderservice;
 
 import java.sql.Time;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.DelayQueue;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 
 import static edu.polina.orderservice.OrderSystem.executor;
@@ -15,15 +19,19 @@ public class Main {
         queue.put(new Order("ORD-Test2", 10000));
         for (int i = 1; i <= 300; i++) {
             Random rn = new Random();
-            int expireMillis = rn.nextInt((int) Math.toIntExact((13000 - 100 + 1) + 100));
+            int expireMillis = ThreadLocalRandom.current().nextInt(100, 1300);
             queue.put(new Order("ORD-" + i, expireMillis));
         }
         try {
+            List<CompletableFuture> futures = new ArrayList<>();
             while (!queue.isEmpty()) {
-                process(queue.take()).join();
+                futures.add(process(queue.take()));
                 if (executor.getCompletedTaskCount() % 100 == 0) {
                     OrderSystem.checkStatus();
                 }
+            }
+            for (CompletableFuture<Void> cf : futures) {
+                cf.join();
             }
         } catch (InterruptedException _) {
             Thread.currentThread().interrupt();

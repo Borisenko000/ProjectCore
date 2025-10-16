@@ -26,14 +26,13 @@ public class OrderSystem {
 
     }
 
-    private static int randomDelay(long timeFrom, long timeTo) {
-        Random rn = new Random();
-        return rn.nextInt((int) (Math.toIntExact(timeTo - timeFrom + 1) + timeFrom));
+    private static int randomDelay(int timeFrom, int timeTo) {
+        return ThreadLocalRandom.current().nextInt(timeFrom, timeTo);
     }
 
     private static String pay(Order o) {
         o.expireMillis += randomDelay(1000, 3000) ;
-        return new String(o.id);
+        return o.id;
     }
 
     private static CompletableFuture<String> ship(Object payment) {
