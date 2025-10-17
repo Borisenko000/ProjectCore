@@ -9,50 +9,60 @@ import java.util.concurrent.RecursiveTask;
 import java.util.stream.Collectors;
 
 public class ForkJoinDocTask extends RecursiveTask<Map<String, Long>> {
-    public static List<Path> docs;
-    int splitThreshold = 1000;
+    DocLoader loader;
+    public List<Path> docs;
+    int splitThreshold;
+    boolean blocker;
 
-    ForkJoinDocTask(List<Path> docs, int splitThreshold) {
+    ForkJoinDocTask(List<Path> docs, int splitThreshold, boolean blocker, DocLoader loader) {
         this.docs = docs;
         this.splitThreshold = splitThreshold;
+        this.blocker = blocker;
+        this.loader = loader;
     }
 
     @Override
     public Map<String, Long> compute() {
-        ManagedFileBlocker fileBlocker = new ManagedFileBlocker(docs);
         if (docs.size() < splitThreshold) {
             List<String> generalText = new ArrayList<>();
-            try {
-                ForkJoinPool.managedBlock(fileBlocker);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
+            if (blocker) {
+                for (Path p : docs) {
+                    ManagedFileBlocker fileBlocker = new ManagedFileBlocker(p);
+                    try {
+                        ForkJoinPool.managedBlock(fileBlocker);
+                    } catch (InterruptedException _) {
+                        Thread.currentThread().interrupt();
+                    }
+                    generalText.addAll(fileBlocker.getResult());
+                }
+                try {
+                    ForkJoinPool.managedBlock(new ManagedSleepBlocker(3));
+                } catch (InterruptedException _) {
+                    Thread.currentThread().interrupt();
+                }
+                List<String> docWords = TextParser.toWords(generalText);
+                return docWords.stream().collect(Collectors.groupingBy(s -> s, Collectors.counting()));
             }
-            generalText = fileBlocker.getResult();
-            /* for (Path p : docs) {
-                generalText.addAll(DocLoader.load(p));
+            else {
+                for (Path p : docs) {
+                    generalText.addAll(loader.load(p));
+                }
+                    List<String> docWords = TextParser.toWords(generalText);
+                    return docWords.stream().collect(Collectors.groupingBy(s -> s, Collectors.counting()));
             }
-             */
-            try {
-                ForkJoinPool.managedBlock(new ManagedSleepBlocker(generalText));
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-            }
-            List<String> docWords = TextParser.toWords(generalText);
-            return docWords.stream().collect(Collectors.groupingBy(s -> s, Collectors.counting()));
         }
-        List<String> generalText = new ArrayList<>();
-        int halfDocSum = DocLoader.docsSum / 2;
+
+        int halfDocSum = docs.size()/2;
         List<Path> docshalf1 = docs.subList(0,halfDocSum);
         List<Path> docshalf2 = docs.subList(halfDocSum, docs.size());
-        ForkJoinDocTask first = new ForkJoinDocTask(docshalf1, splitThreshold);
-        ForkJoinDocTask second = new ForkJoinDocTask(docshalf2, splitThreshold);
+        ForkJoinDocTask first = new ForkJoinDocTask(docshalf1, splitThreshold, blocker, loader);
+        ForkJoinDocTask second = new ForkJoinDocTask(docshalf2, splitThreshold, blocker, loader);
         first.fork();
         Map<String, Long> result = second.compute();
         Map<String, Long> mapHalf = first.join();
-        for (Map.Entry<String, Long> pair : result.entrySet()) {
+        for (Map.Entry<String, Long> pair : mapHalf.entrySet()) {
             result.merge(pair.getKey(), pair.getValue(), Long::sum);
         }
-        DocLoader.docsSum = 0;
         return result;
 
     }
