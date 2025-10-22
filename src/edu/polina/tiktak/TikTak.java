@@ -16,7 +16,7 @@ public class TikTak {
 class ThreadRunnable implements Runnable {
     static Object lock = new Object();
     String word;
-    static int i = 0;
+    static int i = 1;
 
     public ThreadRunnable(String word) {
         this.word = word;
@@ -26,11 +26,11 @@ class ThreadRunnable implements Runnable {
     public void run() {
         synchronized (lock) {
             while (true) {
-                if (i % 2 == 0) {
+                if (i % 2 == 1 && word.equals("tik")) {
                     System.out.println(word);
                     i++;
                     lock.notify();
-                    while (i % 2 != 0) {
+                    while (i % 2 != 1) {
                         try {
                             lock.wait();
                         } catch (InterruptedException e) {
@@ -38,11 +38,11 @@ class ThreadRunnable implements Runnable {
                         }
                     }
                 }
-                if (i % 2 == 1) {
+                if (i % 2 == 0 && word.equals("tak")) {
                     System.out.println(word);
                     i++;
                     lock.notify();
-                    while (i % 2 != 1) {
+                    while (i % 2 != 0) {
                         try {
                             lock.wait();
                         } catch (InterruptedException e) {
