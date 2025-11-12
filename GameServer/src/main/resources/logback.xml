@@ -1,0 +1,21 @@
+<configuration>
+
+    <!-- Куда выводим -->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- 🔹 Уровень логирования для Jetty -->
+    <logger name="org.eclipse.jetty" level="WARN"/>
+
+    <!-- 🔹 Уровень логирования для всего остального твоего кода -->
+    <logger name="edu.polina" level="INFO"/>
+
+    <!-- 🔹 Уровень по умолчанию (для других библиотек) -->
+    <root level="WARN">
+        <appender-ref ref="CONSOLE"/>
+    </root>
+
+</configuration>

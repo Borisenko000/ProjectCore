@@ -1,0 +1,21 @@
+<configuration>
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} %-5level %logger{24} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- Тише Jetty -->
+    <logger name="org.eclipse.jetty" level="WARN"/>
+    <!-- можно ещё жёстче: -->
+    <logger name="org.eclipse.jetty.util.component" level="ERROR"/>
+    <logger name="org.eclipse.jetty.io" level="ERROR"/>
+
+    <!-- Логи твоего приложения -->
+    <logger name="edu.server" level="INFO"/>
+
+    <!-- Общий уровень по умолчанию -->
+    <root level="INFO">
+        <appender-ref ref="CONSOLE"/>
+    </root>
+</configuration>
