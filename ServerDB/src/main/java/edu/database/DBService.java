@@ -13,7 +13,7 @@ public class DBService {
     private final Connection connection;
     private static DBService dbService;
 
-    public DBService() { this.connection = getH2Connection(); }
+    public DBService() { this.connection = getPostgresConnection(); }
 
     public static DBService getInstance() {
         if (dbService == null) {
@@ -22,9 +22,9 @@ public class DBService {
         return dbService;
     }
 
-    public UsersDataSet getUser(long id) throws DBException {
+    public UsersDataSet getUser(String login) throws DBException {
         try {
-            return (new UsersDAO(connection).get(id));
+            return (new UsersDAO(connection).get(login));
         } catch (SQLException e) {
             throw  new DBException(e);
         }
@@ -103,6 +103,19 @@ public class DBService {
             } catch (SQLException e) {
                 throw new RuntimeException("cant connect H2 to" + url);
             }
+     }
+
+     public static Connection getPostgresConnection() {
+        String url = "jdbc:postgresql://localhost:5432/testdb";
+        String user = "postgres";
+        String password = "postgres";
+
+        try {
+            Class.forName("org.postgresql.Driver");
+            return DriverManager.getConnection(url, user, password);
+        } catch (Exception e) {
+            throw new RuntimeException("Cannot connect to PestgresSQL" + e.getMessage(), e);
+        }
      }
 
 }

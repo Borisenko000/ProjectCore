@@ -3,6 +3,7 @@ package edu.server;
 import com.google.gson.Gson;
 import edu.database.DBException;
 import edu.database.DBService;
+import edu.database.dataSets.UsersDataSet;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -23,7 +24,7 @@ public class SignInServlet extends HttpServlet {
         String login = request.getParameter("login");
         String pass = request.getParameter("password");
         var db = DBService.getInstance();
-        var user= db.findByLogin(login);
+        UsersDataSet user= db.getUser(login);
         UserProfile profile = accountService.getUserByLogin(login);
 
         if (profile == null && user == null) {
@@ -32,10 +33,15 @@ public class SignInServlet extends HttpServlet {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             return;
         }
-
-        response.setContentType("text/html;charset=utf-8");
-        response.getWriter().println("Authorized: " + login);
-        response.setStatus(HttpServletResponse.SC_OK);
+        if (user.getPassword().equals(pass) && user.getName().equals(login)) {
+            response.setContentType("text/html;charset=utf-8");
+            response.getWriter().println("Authorized: " + login);
+            response.setStatus(HttpServletResponse.SC_OK);
+        } else {
+            response.setContentType("text/html;charset=utf-8");
+            response.getWriter().println("Incorrect login or password");
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        }
     }
 
 

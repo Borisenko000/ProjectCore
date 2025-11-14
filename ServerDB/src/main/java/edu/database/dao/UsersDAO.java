@@ -14,9 +14,11 @@ public class UsersDAO {
         this.executor = new Executor(connection);
     }
 
-    public UsersDataSet get(long id) throws SQLException {
-        return executor.execQuery("select * from users where id=" + id, result -> {
-            result.next();
+    public UsersDataSet get(String login) throws SQLException {
+        return executor.execQuery("select * from users where login='" + login + "'", result -> {
+            if(!result.next()) {
+                return null;
+            }
             return new UsersDataSet(result.getLong(1), result.getString(2), result.getString(3));
         });
     }
@@ -33,7 +35,11 @@ public class UsersDAO {
     }
 
     public void createTable() throws SQLException {
-        executor.execUpdate("create table if not exists users (id bigint auto_increment, login varchar(256), password varchar(256), primary key (id))");
+        executor.execUpdate( "create table if not exists users (" +
+                "id bigserial primary key, " +
+                "login varchar(256), " +
+                "password varchar(256)" +
+                ")");
     }
 
     public void dropTable() throws SQLException {
