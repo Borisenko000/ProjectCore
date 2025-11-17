@@ -1,4 +1,4 @@
-package edu.database.executor;
+package edu.database.jdbc.executor;
 
 import java.sql.Connection;
 import java.sql.ResultSet;

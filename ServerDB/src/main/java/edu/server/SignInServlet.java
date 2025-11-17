@@ -1,9 +1,7 @@
 package edu.server;
 
-import com.google.gson.Gson;
-import edu.database.DBException;
 import edu.database.DBService;
-import edu.database.dataSets.UsersDataSet;
+import edu.database.jdbc.dataSets.UsersDataSet;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;

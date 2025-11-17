@@ -1,4 +1,4 @@
-package edu.database.dataSets;
+package edu.database.jdbc.dataSets;
 
 public class UsersDataSet {
     private long id;

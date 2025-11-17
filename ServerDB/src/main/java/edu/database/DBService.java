@@ -1,8 +1,7 @@
 package edu.database;
 
-import edu.database.dao.UsersDAO;
-import edu.database.dataSets.UsersDataSet;
-import org.h2.jdbcx.JdbcDataSource;
+import edu.database.jdbc.dao.UsersDAO;
+import edu.database.jdbc.dataSets.UsersDataSet;
 
 import java.sql.Connection;
 import java.sql.Driver;
@@ -89,21 +88,6 @@ public class DBService {
         }
         return null;
     }
-     public  static Connection getH2Connection() {
-            String url = "jdbc:h2:./h2db";
-            String name = "tully";
-            String pass = "tully";
-            JdbcDataSource ds = new JdbcDataSource();
-            ds.setURL(url);
-            ds.setUser(name);
-            ds.setPassword(pass);
-            try {
-                Connection connection = DriverManager.getConnection(url, name, pass);
-                return connection;
-            } catch (SQLException e) {
-                throw new RuntimeException("cant connect H2 to" + url);
-            }
-     }
 
      public static Connection getPostgresConnection() {
         String url = "jdbc:postgresql://localhost:5432/testdb";

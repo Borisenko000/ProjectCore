@@ -1,8 +1,7 @@
 package edu.server;
 
-import edu.database.DBException;
 import edu.database.DBService;
-import edu.database.dataSets.UsersDataSet;
+import edu.database.luquibase.LiquibaseRunner;
 import org.eclipse.jetty.ee10.servlet.ServletContextHandler;
 import org.eclipse.jetty.ee10.servlet.ServletHolder;
 import org.eclipse.jetty.server.Handler;
@@ -16,7 +15,7 @@ import org.slf4j.LoggerFactory;
 public class Main {
     public static void main(String[] args) throws Exception {
         Logger log = LoggerFactory.getLogger(Main.class);
-
+        LiquibaseRunner.runMigrations();
         AccountService accountService = new AccountService();
 
         accountService.addNewUser(new UserProfile("admin"));
@@ -25,6 +24,7 @@ public class Main {
         ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
         context.addServlet(new ServletHolder(new SignUpServlet(accountService)), "/signup");
         context.addServlet(new ServletHolder(new SignInServlet(accountService)), "/signin");
+        context.addServlet(new ServletHolder(new UsersServlet()), "/user");
 
         ResourceHandler resource_handler = new ResourceHandler();
         resource_handler.setBaseResource(ResourceFactory.root().newResource("public_html"));

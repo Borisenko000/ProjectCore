@@ -1,7 +1,7 @@
-package edu.database.dao;
+package edu.database.jdbc.dao;
 
-import edu.database.dataSets.UsersDataSet;
-import edu.database.executor.Executor;
+import edu.database.jdbc.dataSets.UsersDataSet;
+import edu.database.jdbc.executor.Executor;
 
 import java.sql.Connection;
 import java.sql.SQLException;

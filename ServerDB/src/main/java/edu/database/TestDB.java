@@ -1,6 +1,6 @@
 package edu.database;
 
-import edu.database.dataSets.UsersDataSet;
+import edu.database.jdbc.dataSets.UsersDataSet;
 
 public class TestDB {
     public static void main(String[] args) {
