@@ -10,6 +10,7 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 
 public class UsersServlet extends HttpServlet {
 
@@ -44,8 +45,8 @@ public class UsersServlet extends HttpServlet {
         String login = request.getParameter("login");
         if (id != null) {
             try {
-                UserEntity user = userService.getUserById(Long.valueOf(id));
-                if (user == null) {
+                Optional<UserEntity> user = userService.getUserById(Long.valueOf(id));
+                if (user.isEmpty()) {
                     response.setContentType("text/plain;charset=utf-8");
                     response.setStatus(HttpServletResponse.SC_NOT_FOUND);
                     response.getWriter().println("User isn't exist");
@@ -62,15 +63,15 @@ public class UsersServlet extends HttpServlet {
             }
         }
         if (login != null) {
-            UserEntity user = userService.getUserByLog(login);
-            if (user == null) {
+            Optional<UserEntity>  user = userService.getUserByLog(login);
+            if (user.isEmpty()) {
                 response.setContentType("text/plain;charset=utf-8");
                 response.getWriter().println("User isn't exist");
                 response.setStatus(HttpServletResponse.SC_NOT_FOUND);
                 return;
             }
             response.setContentType("application/json;charset=utf-8");
-            response.getWriter().println(gson.toJson(user));
+            response.getWriter().println(gson.toJson(user.get()));
             response.setStatus(HttpServletResponse.SC_OK);
             return;
         }
@@ -89,14 +90,14 @@ public class UsersServlet extends HttpServlet {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             return;
         }
-        UserEntity user = userService.getUserByLog(login);
-        if (user == null) {
+        Optional<UserEntity> user = userService.getUserByLog(login);
+        if (user.isEmpty()) {
             response.setContentType("text/plain;charset=utf-8");
             response.getWriter().println("User doesn't exist");
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
             return;
         }
-        userService.delete(user);
+        userService.delete(user.get());
         response.setContentType("text/plain;charset=utf-8");
         response.getWriter().println("User " + login + " is deleted");
         response.setStatus(HttpServletResponse.SC_OK);

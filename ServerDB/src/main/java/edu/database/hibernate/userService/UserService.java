@@ -4,6 +4,7 @@ import edu.database.hibernate.usersDAO.UsersDAO;
 import edu.database.hibernate.usersEntity.UserEntity;
 
 import java.util.List;
+import java.util.Optional;
 
 public class UserService {
 
@@ -13,11 +14,11 @@ public class UserService {
          usersDao.insertUser(login, password);
      }
 
-     public UserEntity getUserByLog(String login) {
-         return usersDao.getUserbyLogin(login);
+     public Optional<UserEntity> getUserByLog(String login) {
+         return usersDao.getUserByLogin(login);
      }
 
-     public UserEntity getUserById(Long id) {
+     public Optional<UserEntity> getUserById(Long id) {
          return usersDao.get(id);
      }
 

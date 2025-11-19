@@ -12,9 +12,9 @@ import java.sql.DriverManager;
 public class LiquibaseRunner {
 
     public static void runMigrations() {
-        String url = "jdbc:postgresql://localhost:5432/testdb";
-        String user = "postgres";
-        String pass = "postgres";
+        String url = System.getProperty("db.url");
+        String user = System.getProperty("db.user");
+        String pass = System.getProperty("db.password");
 
         try (Connection connection = DriverManager.getConnection(url, user, pass)) {
             Database database = DatabaseFactory.getInstance()

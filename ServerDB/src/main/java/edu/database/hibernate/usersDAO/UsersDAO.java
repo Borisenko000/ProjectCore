@@ -8,30 +8,23 @@ import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Root;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-
-import java.sql.SQLException;
 import java.util.List;
+import java.util.Optional;
 
 public class UsersDAO {
 
-    public UserEntity get(Long id) {
-        return HibernateSessionFactoryUtil.getSessionFactory().openSession().get(UserEntity.class, id);
+    public Optional<UserEntity> get(Long id) {
+        return Optional.of(HibernateSessionFactoryUtil.getSessionFactory().openSession().get(UserEntity.class, id));
     }
 
 
-    public UserEntity getUserbyLogin(String login) {
+    public Optional<UserEntity> getUserByLogin(String login) {
         try (Session session = HibernateSessionFactoryUtil.getSessionFactory().openSession()) {
             CriteriaBuilder cb = session.getCriteriaBuilder();
             CriteriaQuery<UserEntity> cq = cb.createQuery(UserEntity.class);
             Root<UserEntity> root = cq.from(UserEntity.class);
             cq.select(root).where(cb.equal(root.get("login"), login));
-            UserEntity user;
-            try {
-                user = session.createQuery(cq).getSingleResult();
-            } catch (NoResultException e) {
-                return null;
-            }
-            return user;
+            return Optional.of(session.createQuery(cq).getSingleResultOrNull());
         }
     }
 
@@ -73,11 +66,21 @@ public class UsersDAO {
         }
     }
 
-    public void createTable() throws SQLException {
 
-    }
+    public void dropTable() {
+        Transaction tx = null;
+        try (Session session = HibernateSessionFactoryUtil.getSessionFactory().openSession()) {
+            try {
+                tx = session.beginTransaction();
+                int amount = session.createQuery("DELETE FROM UserEntity").executeUpdate();
+                tx.commit();
+            } catch (Exception e) {
+                if (tx != null) {
+                    tx.rollback();
+                    throw e;
+                }
+            }
 
-    public void dropTable() throws SQLException {
-
+        }
     }
 }

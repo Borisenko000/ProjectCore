@@ -12,7 +12,19 @@ public class DBService {
     private final Connection connection;
     private static DBService dbService;
 
-    public DBService() { this.connection = getPostgresConnection(); }
+    public DBService() {
+        String db = System.getProperty("db.type");
+        if (db.equals("postgres")) {
+            this.connection = getPostgresConnection();
+        }
+        else if (db.equals("mysql")) {
+            this.connection = getMysqlConnection();
+        }
+        else {
+            this.connection = getPostgresConnection();
+        }
+
+    }
 
     public static DBService getInstance() {
         if (dbService == null) {
@@ -33,7 +45,6 @@ public class DBService {
         try {
             connection.setAutoCommit(false);
             UsersDAO dao = new UsersDAO(connection);
-            dao.createTable();
             dao.insertUser(name, password);
             connection.commit();
             return dao.getUserId(name);
@@ -68,37 +79,29 @@ public class DBService {
     }
 
     public static Connection getMysqlConnection() {
+        String url = System.getProperty("db.url");
+        String user = System.getProperty("db.user");
+        String password = System.getProperty("db.password");
         try {
-            DriverManager.registerDriver((Driver) Class.forName("com.mysql.jdbc.Driver").newInstance());
-            StringBuilder url = new StringBuilder();
-
-            url.
-                    append("jdbc:mysql://").        //db type
-                    append("localhost:").           //host name
-                    append("3306/").                //port
-                    append("db_example?").          //db name
-                    append("user=tully&").          //login
-                    append("password=tully");       //password
-            System.out.println("URL: " + url + "\n");
-
-            Connection connection = DriverManager.getConnection(url.toString());
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            Connection connection = DriverManager.getConnection(url, user, password);
             return connection;
-        } catch (SQLException | InstantiationException | IllegalAccessException | ClassNotFoundException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+            throw new RuntimeException("Cannot connect to MySQL" + e.getMessage(), e);
         }
-        return null;
     }
 
      public static Connection getPostgresConnection() {
-        String url = "jdbc:postgresql://localhost:5432/testdb";
-        String user = "postgres";
-        String password = "postgres";
+        String url = System.getProperty("db.url");
+        String user = System.getProperty("db.user");
+        String password = System.getProperty("db.password");
 
         try {
             Class.forName("org.postgresql.Driver");
-            return DriverManager.getConnection(url, user, password);
+            Connection connection = DriverManager.getConnection(url, user, password);
+            return connection;
         } catch (Exception e) {
-            throw new RuntimeException("Cannot connect to PestgresSQL" + e.getMessage(), e);
+            throw new RuntimeException("Cannot connect to PostgresSQL" + e.getMessage(), e);
         }
      }
 
