@@ -23,7 +23,6 @@ public class DBService {
         else {
             this.connection = getPostgresConnection();
         }
-
     }
 
     public static DBService getInstance() {
