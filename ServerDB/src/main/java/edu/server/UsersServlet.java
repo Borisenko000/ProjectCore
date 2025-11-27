@@ -27,7 +27,7 @@ public class UsersServlet extends HttpServlet {
             response.getWriter().println("Login and password required");
             return;
         }
-        if (userService.getUserByLog(login) != null) {
+        if (userService.getUserByLog(login).isPresent()) {
             response.setContentType("text/plain;charset=utf-8");
             response.setStatus(HttpServletResponse.SC_CONFLICT);
             response.getWriter().println("User with login " + login + " already exists");

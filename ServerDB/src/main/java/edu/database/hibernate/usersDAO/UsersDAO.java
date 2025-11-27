@@ -14,7 +14,7 @@ import java.util.Optional;
 public class UsersDAO {
 
     public Optional<UserEntity> get(Long id) {
-        return Optional.of(HibernateSessionFactoryUtil.getSessionFactory().openSession().get(UserEntity.class, id));
+        return Optional.ofNullable(HibernateSessionFactoryUtil.getSessionFactory().openSession().get(UserEntity.class, id));
     }
 
 
@@ -24,7 +24,7 @@ public class UsersDAO {
             CriteriaQuery<UserEntity> cq = cb.createQuery(UserEntity.class);
             Root<UserEntity> root = cq.from(UserEntity.class);
             cq.select(root).where(cb.equal(root.get("login"), login));
-            return Optional.of(session.createQuery(cq).getSingleResultOrNull());
+            return Optional.ofNullable(session.createQuery(cq).getSingleResultOrNull());
         }
     }
 
@@ -32,12 +32,14 @@ public class UsersDAO {
         Transaction tx = null;
         try (Session session = HibernateSessionFactoryUtil.getSessionFactory().openSession()) {
             tx = session.beginTransaction();
-            session.persist(new UserEntity(login, password));
+            try {
+                session.persist(new UserEntity(login, password));
             tx.commit();
-        } catch (Exception e) {
-            if (tx != null) {
-                tx.rollback();
-                throw e;
+            } catch (Exception e) {
+                if (tx != null) {
+                    tx.rollback();
+                    throw e;
+                }
             }
         }
     }
@@ -53,15 +55,17 @@ public class UsersDAO {
         Transaction tx = null;
         try (Session session = HibernateSessionFactoryUtil.getSessionFactory().openSession()) {
             tx = session.beginTransaction();
+            try {
             UserEntity user = session.get(UserEntity.class, id);
             if (user != null) {
                 session.remove(user);
             }
             tx.commit();
-        } catch (Exception e) {
-            if (tx != null) {
-                tx.rollback();
-                throw e;
+            } catch (Exception e) {
+                if (tx != null) {
+                    tx.rollback();
+                    throw e;
+                }
             }
         }
     }
@@ -70,8 +74,8 @@ public class UsersDAO {
     public void dropTable() {
         Transaction tx = null;
         try (Session session = HibernateSessionFactoryUtil.getSessionFactory().openSession()) {
+            tx = session.beginTransaction();
             try {
-                tx = session.beginTransaction();
                 int amount = session.createQuery("DELETE FROM UserEntity").executeUpdate();
                 tx.commit();
             } catch (Exception e) {
@@ -80,7 +84,6 @@ public class UsersDAO {
                     throw e;
                 }
             }
-
         }
     }
 }
