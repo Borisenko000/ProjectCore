@@ -8,6 +8,8 @@ out/
 build/
 *.class
 *.log
+*.mv.db
+*.trace.db
 
 # Gradle/Maven
 .gradle/
