@@ -1,0 +1,60 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: user-service
+  config:
+      import: "optional:configserver:http://localhost:8888"
+
+  cache:
+    type: redis
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/users
+    username: admin
+    password: admin
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+
+  data:
+    redis:
+      host: ${SPRING_REDIS_HOST:localhost}
+      port: ${SPRING_REDIS_PORT:6379}
+      password: ${SPRING_REDIS_PASSWORD:redispassword}
+
+  kafka:
+    bootstrap-servers: localhost:29092
+    admin:
+      auto-create: true
+    properties:
+      schema.registry.url: http://localhost:8081
+    consumer:
+      group-id: my-group
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8082/realms/user-app
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info, prometheus, bus-refresh
+
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_URL:http://localhost:8761/eureka/}
+
+
+external:
+  wire-mock:
+    welcome-url: http://localhost:8090
+

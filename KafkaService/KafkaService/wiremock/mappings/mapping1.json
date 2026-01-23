@@ -1,0 +1,17 @@
+{
+    "scenarioName": "UserAuthorization",
+    "requiredScenarioState": "Started",
+    "newScenarioState": "UserAuthorized",
+    "request": {
+        "method": "POST",
+        "urlPath": "/welcome"
+    },
+    "response": {
+        "status": 200,
+        "headers": {
+            "Content-Type": "application/json"
+        },
+        "body": "{\"message\": \"Hello, user {{jsonPath request.body '$.name'}}!\"}",
+        "transformers": ["response-template"]
+    }
+}

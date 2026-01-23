@@ -1,0 +1,16 @@
+{
+    "scenarioName": "UserAuthorization",
+    "requiredScenarioState": "UserAuthorized",
+    "newScenarioState": "Timeout",
+    "request": {
+        "method": "POST",
+        "urlPath": "/welcome"
+    },
+    "response": {
+        "status": 504,
+        "headers": {
+            "Content-Type": "application/json"
+        },
+        "body": "{\"message\": \"Request timed out, please retry\"}"
+    }
+}

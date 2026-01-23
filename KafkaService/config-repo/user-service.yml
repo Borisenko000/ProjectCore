@@ -1,0 +1,23 @@
+app:
+  cache:
+    user:
+      ttl: 3600s
+  rate-limit:
+      limit: 5
+      window: 60s
+  key-space-notifications:
+    ttl: 20s
+  feature:
+    registration-enabled: false
+
+logging:
+  level:
+    root: WARN
+    edu.polina.kafkaservice: INFO
+
+user-created-topic: user.created.event
+user-deleted-topic: user.deleted.event
+user-created-dlq-topic: user.created.event.dlq
+
+test:
+  mode: false
