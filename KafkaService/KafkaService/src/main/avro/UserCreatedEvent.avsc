@@ -1,0 +1,10 @@
+{
+  "type": "record",
+  "name": "UserCreatedEvent",
+  "namespace": "edu.polina.kafkaservice.kafka",
+  "fields": [
+    { "name": "eventId", "type": "string" },
+    { "name": "occurredAt", "type": { "type": "long", "logicalType": "timestamp-millis" } },
+    { "name": "userId", "type": "long" }
+  ]
+}
