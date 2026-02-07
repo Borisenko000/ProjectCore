@@ -8,28 +8,26 @@ import lombok.*;
 
 @Entity
 @Table(name = "users")
-@Getter
-@Setter
+@Data
+@AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class User {
 
-    public User(String login, String password) {
-        this.login = login;
+    public User(String email, String password) {
+        this.email = email;
         this.password = password;
     }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    @Null
     private Long id;
 
-    @Column(name = "login", unique = true, nullable = false)
-    @NotNull
-    private String login;
+    @Column(name = "email", unique = true, nullable = false, length = 20)
+    private String email;
 
-    @Column(name = "password", nullable = false)
-    @NotNull
-    @Size(min = 6)
+
+    @Column(name = "password_hash", nullable = false, length = 60)
     private String password;
 }

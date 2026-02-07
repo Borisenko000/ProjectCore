@@ -1,16 +1,18 @@
 package edu.spring.service;
 
 import edu.spring.module.User;
+import edu.spring.module.UserRequestDto;
+import edu.spring.module.UserResponseDto;
 
 import java.util.List;
 import java.util.Optional;
 
 public interface UserService {
-    public void createUser(String login, String password);
+    public UserResponseDto createUser(UserRequestDto request);
 
-    public Optional<User> getUserByLog(String login);
+    public User getUserByEmail(String email);
 
-    public Optional<User> getUserById(Long id);
+    public User getUserById(Long id);
 
     public void deleteUser(User user);
 

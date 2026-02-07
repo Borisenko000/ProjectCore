@@ -6,10 +6,8 @@
           http://www.liquibase.org/xml/ns/dbchangelog
           http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
 
-    <include file="db/db.changelog-1.0-init-users.xml"/>
-    <include file="db/db.changelog-2.0-init-users.xml"/>
-    <include file="db/db.changelog-3.0-init-users.xml"/>
-    <include file="db/db.changelog-4.0-init-users.xml"/>
-    <include file="db/db.changelog-5.0-init-users.xml"/>
+    <changeSet id="4-drop-column-with-plain-pass" author="polina">
+        <dropColumn tableName="users" columnName="password"/>
+    </changeSet>
 
 </databaseChangeLog>
